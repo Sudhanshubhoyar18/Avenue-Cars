@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: avenue-cars
+    env: node
+    plan: free
+    buildCommand: npm install && npx prisma db push && node prisma/seed.js && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: ADMIN_EMAILS
+        value: tejas.singh@avenuecars.com,falgunkubde@gmail.com
+      - key: GOOGLE_CLIENT_ID
+        value: dummy-google-client-id
+      - key: GOOGLE_CLIENT_SECRET
+        value: dummy-google-client-secret
+      - key: EMAIL_FROM
+        value: Avenue Cars <notifications@avenuecars.com>
