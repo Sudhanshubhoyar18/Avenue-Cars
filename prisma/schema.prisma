@@ -1,0 +1,199 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("VENDOR") // "ADMIN" | "VENDOR"
+  vendorId      String?   // Linked vendor profile if role is VENDOR
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  vendor        Vendor?   @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  accounts      Account[]
+  sessions      Session[]
+  auditLogs     AuditLog[]
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Customer {
+  id                String    @id @default(uuid())
+  name              String
+  phone             String    @unique
+  email             String?
+  city              String?
+  address           String?
+  emergencyContact  String?
+  licenseNumber     String?   // Driving License Number
+  idProofType       String?   @default("Aadhaar") // "Aadhaar" | "Passport" | "Voter ID"
+  idProofNumber     String?
+  securityDeposit   Float     @default(0) // Refundable security deposit held in INR
+  depositStatus     String    @default("NONE") // "NONE" | "HELD" | "REFUNDED" | "FORFEITED"
+  tag               String    @default("NEW") // "VIP" | "REGULAR" | "NEW" | "CAUTION"
+  status            String    @default("ACTIVE") // "ACTIVE" | "INACTIVE" | "BLACKLISTED"
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  bookings          Booking[]
+}
+
+model Vendor {
+  id                String    @id @default(uuid())
+  name              String
+  email             String    @unique
+  phone             String
+  telegramChatId    String?   // Populated automatically via /start deep-link
+  telegramLinkToken String    @unique @default(uuid()) // One-time connection token
+  status            String    @default("ACTIVE") // "ACTIVE" | "DISABLED"
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  users             User[]
+  cars              Car[]
+  bookings          Booking[]
+  payouts           VendorPayout[]
+  notificationLogs  NotificationLog[]
+}
+
+model Car {
+  id                 String    @id @default(uuid())
+  vendorId           String
+  makeModel          String    // e.g. "Mahindra Scorpio N"
+  variant            String    // e.g. "Z4"
+  color              String    // e.g. "Black"
+  registrationNumber String    @unique // e.g. "MH 12 AB 1234"
+  status             String    @default("AVAILABLE") // "AVAILABLE" | "ON_BOOKING" | "MAINTENANCE" | "INACTIVE"
+  fuelType           String    @default("Diesel") // "Diesel" | "Petrol" | "Electric"
+  transmission       String    @default("Automatic") // "Automatic" | "Manual"
+  seatingCapacity    Int       @default(7)
+  dailyRate          Float     @default(4500) // Suggested base rate per day in INR
+  imageUrl           String?   // Car visual type / illustration
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  vendor             Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  bookings           Booking[]
+}
+
+model Booking {
+  id                 String    @id @default(uuid())
+  carId              String
+  vendorId           String
+  customerId         String?   // Linked CRM customer profile
+  customerName       String?
+  invoiceNumber      String?   // Official invoice number (e.g. INV-2026-0042)
+  invoiceDate        DateTime?
+  pickupDatetime     DateTime
+  returnDatetime     DateTime? // Nullable when mightExtend = true
+  destination        String    // Area of travel / city
+  totalAmount        Float     // In INR
+  amountPaid         Float     @default(0) // In INR
+  amountUnpaid       Float     // Auto-calculated: totalAmount - amountPaid
+  securityDeposit    Float     @default(0) // Refundable security deposit for this booking
+  paymentStatus      String    @default("UNPAID") // "PAID" | "PARTIALLY_PAID" | "UNPAID"
+  mightExtend        Boolean   @default(false)
+  vendorPayoutAmount Float     @default(0) // What WE owe vendor for this booking
+  bookingStatus      String    @default("CONFIRMED") // "CONFIRMED" | "COMPLETED" | "CANCELLED"
+  notes              String?
+  createdBy          String?   // Admin email or name who created the booking
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  car                Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+  vendor             Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  customer           Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  notificationLogs   NotificationLog[]
+}
+
+model VendorPayout {
+  id            String    @id @default(uuid())
+  vendorId      String
+  amount        Float     // Amount paid to vendor in INR
+  paymentDate   DateTime  @default(now())
+  paymentMethod String    @default("UPI") // "UPI" | "BANK_TRANSFER" | "CASH" | "OTHER"
+  referenceId   String?   // UTR or transaction reference number
+  notes         String?
+  createdBy     String?   // Admin who recorded the payout
+  createdAt     DateTime  @default(now())
+
+  vendor        Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+model NotificationLog {
+  id              String    @id @default(uuid())
+  bookingId       String
+  vendorId        String
+  channel         String    // "EMAIL" | "TELEGRAM"
+  eventType       String    // "BOOKING_CREATED" | "BOOKING_UPDATED" | "BOOKING_CANCELLED" | "MANUAL_RESEND"
+  status          String    @default("PENDING") // "SENT" | "FAILED" | "PENDING"
+  recipient       String    // Email address or Telegram chat ID
+  errorMessage    String?
+  payload         String?   // JSON string of sent payload
+  retryCount      Int       @default(0)
+  lastAttemptedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  booking         Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  vendor          Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  userEmail  String
+  action     String   // "BOOKING_CREATE" | "BOOKING_EDIT" | "BOOKING_CANCEL" | "PAYOUT_RECORD" | "VENDOR_CREATE" | "CUSTOMER_CREATE" | "CUSTOMER_DELETE" | "PAYMENT_COLLECT" | "LOGIN"
+  entityType String   // "BOOKING" | "CAR" | "VENDOR" | "CUSTOMER" | "PAYOUT" | "INVOICE" | "AUTH"
+  entityId   String?
+  details    String?  // JSON string of change details / state diff
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}

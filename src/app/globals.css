@@ -1,0 +1,383 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #040508;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-subtle-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+  --text-primary: #0B0F19;
+  --text-secondary: #5A6A85;
+}
+
+.dark {
+  --bg-color: #030407;
+  --glass-bg: rgba(14, 16, 25, 0.76);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-subtle-border: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* =========================================================================
+   iPhone iOS Liquid Aurora Mesh Background (Dynamic Drifting & Breathing)
+   ========================================================================= */
+.aurora-bg-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background-color: #030407;
+}
+
+@keyframes aurora-drift-cyan {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.85;
+  }
+  33% {
+    transform: translate(60px, 40px) scale(1.12);
+    opacity: 1;
+  }
+  66% {
+    transform: translate(-30px, 70px) scale(0.96);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.85;
+  }
+}
+
+@keyframes aurora-drift-purple {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.85;
+  }
+  33% {
+    transform: translate(-70px, -40px) scale(1.08);
+    opacity: 1;
+  }
+  66% {
+    transform: translate(40px, -60px) scale(0.98);
+    opacity: 0.82;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.85;
+  }
+}
+
+@keyframes aurora-drift-indigo {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(50px, -50px) scale(1.15);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.75;
+  }
+}
+
+.aurora-orb-cyan {
+  position: absolute;
+  top: -140px;
+  left: -100px;
+  width: 720px;
+  height: 720px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.32) 0%, rgba(20, 184, 166, 0.18) 45%, transparent 70%);
+  filter: blur(110px);
+  will-change: transform, opacity;
+  animation: aurora-drift-cyan 22s ease-in-out infinite alternate;
+}
+
+.aurora-orb-purple {
+  position: absolute;
+  top: 15%;
+  right: -120px;
+  width: 780px;
+  height: 780px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.35) 0%, rgba(99, 102, 241, 0.22) 50%, transparent 70%);
+  filter: blur(120px);
+  will-change: transform, opacity;
+  animation: aurora-drift-purple 26s ease-in-out infinite alternate;
+}
+
+.aurora-orb-indigo {
+  position: absolute;
+  bottom: -160px;
+  left: 22%;
+  width: 850px;
+  height: 850px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.28) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 70%);
+  filter: blur(130px);
+  will-change: transform, opacity;
+  animation: aurora-drift-indigo 24s ease-in-out infinite alternate;
+}
+
+.aurora-orb-teal {
+  position: absolute;
+  top: 45%;
+  left: 5%;
+  width: 550px;
+  height: 550px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.22) 0%, rgba(6, 182, 212, 0.12) 50%, transparent 70%);
+  filter: blur(100px);
+  will-change: transform;
+}
+
+/* =========================================================================
+   iPhone iOS 27 Liquid Glass Surfaces (Saturated Frosted Depth)
+   ========================================================================= */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(36px) saturate(190%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(36px) saturate(190%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  position: relative;
+}
+
+.glass-card:hover {
+  border-color: rgba(99, 102, 241, 0.38);
+  transform: translateY(-2px);
+  box-shadow: 0 24px 60px -10px rgba(99, 102, 241, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================================================
+   iPhone Tactile Click Physics & Radiant Specular Halo Flash
+   ========================================================================= */
+.iphone-btn, .btn-stitch-primary, .btn-stitch-secondary, .btn-accent, .btn-aesthetic, .btn-emerald-glow {
+  transition: transform 0.16s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.18s ease, filter 0.18s ease, background 0.18s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform, box-shadow;
+}
+
+/* iPhone Primary Button (Vibrant Cyan-Indigo-Purple Gradient with Active Halo) */
+.btn-stitch-primary, .btn-accent, .btn-aesthetic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 50%, #8B5CF6 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-top: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 20px -2px rgba(99, 102, 241, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
+}
+
+.btn-stitch-primary:hover, .btn-accent:hover, .btn-aesthetic:hover {
+  background: linear-gradient(135deg, #0284C7 0%, #4F46E5 50%, #7C3AED 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px -2px rgba(99, 102, 241, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Active Click Feedback: Real iPhone Spring Compression + Radiant Light Burst */
+.btn-stitch-primary:active, .btn-accent:active, .btn-aesthetic:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 0 0 5px rgba(14, 165, 233, 0.28), 0 0 35px rgba(99, 102, 241, 0.75), inset 0 0 16px rgba(255, 255, 255, 0.5) !important;
+  filter: brightness(1.22);
+}
+
+/* iPhone Secondary Dark Obsidian Glass Pill Button */
+.btn-stitch-secondary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
+}
+
+.btn-stitch-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.55);
+}
+
+.btn-stitch-secondary:active {
+  transform: scale(0.94) !important;
+  background: rgba(255, 255, 255, 0.24) !important;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.12), 0 0 24px rgba(255, 255, 255, 0.3) !important;
+  filter: brightness(1.2);
+}
+
+/* Emerald Luxury Glow Button (WhatsApp, Cash Collection) */
+.btn-emerald-glow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 18px -2px rgba(16, 185, 129, 0.45);
+}
+
+.btn-emerald-glow:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 26px -2px rgba(16, 185, 129, 0.65);
+}
+
+.btn-emerald-glow:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.28), 0 0 35px rgba(16, 185, 129, 0.75), inset 0 0 16px rgba(255, 255, 255, 0.45) !important;
+  filter: brightness(1.2);
+}
+
+/* iPhone Glass Input Fields */
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border-radius: 18px;
+  color: #F8FAFC;
+  transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: #00F2FE;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.25), 0 0 20px rgba(0, 242, 254, 0.15);
+}
+
+/* =========================================================================
+   iPhone Dynamic Island / Live Activity Pill Component
+   ========================================================================= */
+.dynamic-island {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(28px) saturate(190%);
+  border-radius: 9999px;
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dynamic-island:hover {
+  border-color: rgba(0, 242, 254, 0.35);
+  box-shadow: 0 14px 40px -4px rgba(0, 242, 254, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+}
+
+/* =========================================================================
+   iPhone Toggle Switch (Apple Settings Style)
+   ========================================================================= */
+.ios-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+}
+
+.ios-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ios-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.ios-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+input:checked + .ios-slider {
+  background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.45);
+}
+
+input:checked + .ios-slider:before {
+  transform: translateX(20px);
+}
+
+/* Status Capsules & Iridescent Accents */
+.pill-capsule {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.text-iridescent {
+  background: linear-gradient(135deg, #00F2FE 0%, #818CF8 50%, #C084FC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
